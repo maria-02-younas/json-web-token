@@ -8,8 +8,7 @@ import com.task.Taskjwt.entity.ErrorResponse;
 import com.task.Taskjwt.entity.JwtRequest;
 import com.task.Taskjwt.entity.JwtResponse;
 import com.task.Taskjwt.security.JwtHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -35,8 +34,6 @@ public class AuthController {
     //    To create Jwt
     @Autowired
     private JwtHelper jwtHelper;
-
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
@@ -65,14 +62,15 @@ public class AuthController {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity exceptionHandler() throws JsonProcessingException {
+    public ResponseEntity<String> exceptionHandler() throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+        ErrorResponse errorResponse = ErrorResponse.builder().statusCode("403").message("Invalid Credentials!").build();
+
         return new ResponseEntity<>(
-                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                        new ErrorResponse("403", "Invalid Credentials!")), HttpStatus.FORBIDDEN);
+                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(errorResponse), HttpStatus.FORBIDDEN);
     }
 }

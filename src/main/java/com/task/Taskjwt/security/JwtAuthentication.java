@@ -28,9 +28,10 @@ public class JwtAuthentication implements AuthenticationEntryPoint {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
 
+            ErrorResponse errorResponse = ErrorResponse.builder().statusCode("403").message("Access Denied! You are not authorized to access it.").build();
+
             PrintWriter writer = response.getWriter();
-            writer.write(objectMapper.writeValueAsString(
-                    new ErrorResponse("403", "Access Denied! You are not authorized to access it.")));
+            writer.write(objectMapper.writeValueAsString(errorResponse));
         }
     }
 }
